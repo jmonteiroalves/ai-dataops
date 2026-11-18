@@ -132,23 +132,31 @@ def masthead(snapshot: dict[str, Any]) -> None:
     )
 
 
+def _sync_section_param() -> None:
+    st.query_params["section"] = st.session_state.get("nav_section", "Overview")
+
+
 def navigation() -> str:
-    params = st.query_params
-    requested = params.get("section", "Overview")
+    requested = st.query_params.get("section", "Overview")
     if isinstance(requested, list):
         requested = requested[0]
     if requested not in SECTIONS:
         requested = "Overview"
-    choice = st.radio(
+
+    # The widget owns its state once created. Passing `index` on every rerun
+    # fights the click and can discard it, which is what caused the second click.
+    if "nav_section" not in st.session_state:
+        st.session_state["nav_section"] = requested
+
+    st.radio(
         "Section",
         SECTIONS,
-        index=SECTIONS.index(requested),
+        key="nav_section",
         horizontal=True,
         label_visibility="collapsed",
+        on_change=_sync_section_param,
     )
-    if choice != requested:
-        st.query_params["section"] = choice
-    return str(choice)
+    return str(st.session_state["nav_section"])
 
 
 def plural(count: int, word: str) -> str:
