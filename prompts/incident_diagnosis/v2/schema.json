@@ -1,0 +1,190 @@
+{
+  "$comment": "Documentation snapshot of DiagnosisPayload. The Pydantic model is authoritative; tests assert this file stays compatible.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "summary",
+    "observed_facts",
+    "impact",
+    "investigation_steps",
+    "confidence",
+    "limitations"
+  ],
+  "properties": {
+    "summary": {
+      "type": "string",
+      "minLength": 40,
+      "maxLength": 600
+    },
+    "observed_facts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "statement",
+          "evidence_ids"
+        ],
+        "properties": {
+          "statement": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 400
+          },
+          "evidence_ids": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "affected_indicators": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "observed",
+          "unit"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "observed": {
+            "type": "number"
+          },
+          "expected": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "unit": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "hypotheses": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "cause",
+          "evidence_ids",
+          "confidence",
+          "verification_steps"
+        ],
+        "properties": {
+          "cause": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 300
+          },
+          "evidence_ids": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "verification_steps": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 5,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "impact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "affected_consumers",
+        "statement"
+      ],
+      "properties": {
+        "scope": {
+          "type": "string"
+        },
+        "affected_consumers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "statement": {
+          "type": "string"
+        }
+      }
+    },
+    "investigation_steps": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 6,
+      "items": {
+        "type": "string"
+      }
+    },
+    "suggested_actions": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action",
+          "priority"
+        ],
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          }
+        }
+      }
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": {
+        "type": "string"
+      }
+    },
+    "insufficient_evidence": {
+      "type": "boolean"
+    }
+  }
+}

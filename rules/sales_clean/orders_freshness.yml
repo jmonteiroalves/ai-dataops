@@ -1,0 +1,16 @@
+rule_id: orders_freshness
+name: sales_clean must be fresh for the logical date
+dataset: sales_clean
+dimension: freshness
+rule_type: freshness
+config:
+  sla_minutes: 1560
+  timestamp_column: order_date
+severity: high
+threshold: 1.0
+weight: 2.0
+owner: data-platform
+is_active: true
+description: >
+  A successful run must produce data for its own logical date. The 26-hour SLA
+  tolerates a daily batch plus retry headroom.

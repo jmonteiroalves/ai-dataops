@@ -1,0 +1,7 @@
+project_id      = "ai-dataops-demo-jma"
+region          = "us-central1"
+image_tag       = "latest"
+billing_account = "" # optional: billing account id to create budget alerts
+budget_usd      = "5"
+github_owner    = "jmonteiroalves"
+github_repo     = "ai-dataops"

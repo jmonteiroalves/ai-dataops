@@ -1,0 +1,14 @@
+rule_id: orders_completeness_order_id
+name: order_id must be present
+dataset: sales_clean
+dimension: completeness
+rule_type: not_null
+columns: [order_id]
+severity: critical
+threshold: 1.0
+weight: 2.0
+owner: data-platform
+is_active: true
+description: >
+  order_id is the business key of every order. A null value makes the row
+  unidentifiable and breaks uniqueness and lineage checks.

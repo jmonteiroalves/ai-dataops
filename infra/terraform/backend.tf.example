@@ -1,0 +1,6 @@
+terraform {
+  backend "gcs" {
+    bucket = "CHANGE_ME-terraform-state"
+    prefix = "ai-dataops"
+  }
+}

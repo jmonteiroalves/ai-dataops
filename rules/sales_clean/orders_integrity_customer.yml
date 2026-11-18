@@ -1,0 +1,17 @@
+rule_id: orders_integrity_customer
+name: customer_id must exist in dim_customers
+dataset: sales_clean
+dimension: integrity
+rule_type: foreign_key
+columns: [customer_id]
+config:
+  ref_dataset: dim_customers
+  ref_column: customer_id
+severity: high
+threshold: 0.999
+weight: 1.5
+owner: data-platform
+is_active: true
+description: >
+  Orphan customers break segmentation and lifetime-value analysis. Nulls are
+  owned by the completeness rule; this check governs non-null references only.

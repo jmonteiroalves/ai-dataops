@@ -1,0 +1,82 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Image tag to build and deploy"
+        required: true
+        default: "manual"
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      REGION: ${{ vars.GCP_REGION }}
+      REPOSITORY: ai-dataops
+      IMAGE_TAG: ${{ inputs.image_tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOY_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
+
+      - name: Build and push job image
+        run: |
+          IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/job:${IMAGE_TAG}"
+          docker build --build-arg UV_EXTRAS="--extra ai --extra gcp" -t "${IMAGE}" .
+          docker push "${IMAGE}"
+
+      - name: Build and push dashboard image
+        run: |
+          IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/dashboard:${IMAGE_TAG}"
+          docker build --build-arg UV_EXTRAS="--extra dashboard" -t "${IMAGE}" .
+          docker push "${IMAGE}"
+
+      - name: Roll out job
+        run: |
+          gcloud run jobs update dataops-job \
+            --project "${PROJECT_ID}" --region "${REGION}" \
+            --image "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/job:${IMAGE_TAG}"
+
+      - name: Roll out dashboard
+        run: |
+          gcloud run services update dataops-dashboard \
+            --project "${PROJECT_ID}" --region "${REGION}" \
+            --image "${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/dashboard:${IMAGE_TAG}"
+
+      - name: Seed or refresh the demo history
+        run: |
+          gcloud run jobs execute dataops-job \
+            --project "${PROJECT_ID}" --region "${REGION}" --wait \
+            --args="demo","--days","45","--volume","1500"
+
+      - name: Diagnose pending incidents
+        run: |
+          gcloud run jobs execute dataops-job \
+            --project "${PROJECT_ID}" --region "${REGION}" --wait \
+            --args="diagnose","--provider","vertex","--limit","50"
+
+      - name: Publish the serving snapshot
+        run: |
+          gcloud run jobs execute dataops-job \
+            --project "${PROJECT_ID}" --region "${REGION}" --wait \
+            --args="export-serving"

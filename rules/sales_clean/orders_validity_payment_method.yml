@@ -1,0 +1,16 @@
+rule_id: orders_validity_payment_method
+name: payment_method must be a known value
+dataset: sales_clean
+dimension: validity
+rule_type: accepted_values
+columns: [payment_method]
+config:
+  values: [credit_card, debit_card, pix, boleto]
+severity: low
+threshold: 1.0
+weight: 1.0
+owner: data-platform
+is_active: true
+description: >
+  Payment method feeds the financial reconciliation view; unknown values are
+  rejected during cleaning.

@@ -1,0 +1,16 @@
+substitutions:
+  _IMAGE: ""
+  _EXTRAS: ""
+
+steps:
+  - name: gcr.io/kaniko-project/executor:v1.23.2
+    entrypoint: /kaniko/executor
+    args:
+      - --context=dir:///workspace
+      - --dockerfile=Dockerfile
+      - --destination=${_IMAGE}
+      - --build-arg=UV_EXTRAS=${_EXTRAS}
+      - --verbosity=info
+
+options:
+  logging: CLOUD_LOGGING_ONLY

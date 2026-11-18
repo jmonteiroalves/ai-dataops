@@ -1,0 +1,27 @@
+rule_id: orders_schema_contract
+name: sales_raw landing file must match the v1 contract
+dataset: sales_raw
+dimension: schema
+rule_type: schema_contract
+config:
+  expected:
+    - order_id
+    - customer_id
+    - order_ts
+    - order_date
+    - status
+    - payment_method
+    - channel
+    - unit_price
+    - quantity
+    - discount
+    - order_total
+severity: high
+threshold: 1.0
+weight: 2.0
+owner: data-platform
+is_active: true
+description: >
+  Compares the landing file header captured for this execution with the agreed
+  contract. A missing column is breaking; an extra column is additive and still
+  fails until the contract is versioned.

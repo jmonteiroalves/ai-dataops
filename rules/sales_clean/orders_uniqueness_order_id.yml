@@ -1,0 +1,14 @@
+rule_id: orders_uniqueness_order_id
+name: order_id must be unique
+dataset: sales_clean
+dimension: uniqueness
+rule_type: unique
+columns: [order_id]
+severity: high
+threshold: 1.0
+weight: 2.0
+owner: data-platform
+is_active: true
+description: >
+  Duplicate order_ids inflate revenue and break downstream joins. The cleaning
+  step does not deduplicate: duplicates are surfaced, not hidden.

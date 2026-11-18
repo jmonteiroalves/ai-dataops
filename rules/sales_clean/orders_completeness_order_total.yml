@@ -1,0 +1,14 @@
+rule_id: orders_completeness_order_total
+name: order_total must be present
+dataset: sales_clean
+dimension: completeness
+rule_type: not_null
+columns: [order_total]
+severity: high
+threshold: 1.0
+weight: 2.0
+owner: data-platform
+is_active: true
+description: >
+  order_total is the revenue measure. Nulls silently reduce reported revenue
+  without failing the pipeline.

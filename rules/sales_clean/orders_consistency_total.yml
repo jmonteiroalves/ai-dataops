@@ -1,0 +1,17 @@
+rule_id: orders_consistency_total
+name: order_total must match unit_price x quantity x (1 - discount)
+dataset: sales_clean
+dimension: consistency
+rule_type: expression
+columns: [order_total]
+config:
+  predicate: >-
+    abs(order_total - unit_price * quantity * (1 - coalesce(discount, 0))) <= 0.02
+severity: high
+threshold: 0.999
+weight: 1.5
+owner: data-platform
+is_active: true
+description: >
+  Detects calculation drift between the line items and the stored total. The
+  0.02 tolerance absorbs legitimate rounding.

@@ -1,0 +1,18 @@
+rule_id: orders_validity_unit_price
+name: unit_price must be a positive, sane amount
+dataset: sales_clean
+dimension: validity
+rule_type: range
+columns: [unit_price]
+config:
+  min: 0.01
+  max: 100000.0
+severity: medium
+threshold: 1.0
+weight: 1.0
+owner: data-platform
+is_active: true
+description: >
+  Negative or absurd prices indicate a parsing or upstream pricing bug. The
+  upper bound is intentionally generous to avoid flagging legitimate premium
+  products.

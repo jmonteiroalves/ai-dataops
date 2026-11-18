@@ -1,0 +1,16 @@
+rule_id: orders_validity_status
+name: status must be a known value
+dataset: sales_clean
+dimension: validity
+rule_type: accepted_values
+columns: [status]
+config:
+  values: [completed, cancelled, pending]
+severity: medium
+threshold: 1.0
+weight: 1.0
+owner: data-platform
+is_active: true
+description: >
+  Unknown status values cannot be mapped to the revenue lifecycle and are
+  rejected during cleaning. This rule asserts the clean contract.

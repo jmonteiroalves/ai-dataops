@@ -1,0 +1,14 @@
+rule_id: orders_completeness_customer_id
+name: customer_id must be present
+dataset: sales_clean
+dimension: completeness
+rule_type: not_null
+columns: [customer_id]
+severity: high
+threshold: 0.99
+weight: 1.5
+owner: data-platform
+is_active: true
+description: >
+  customer_id is required for revenue attribution. Nulls break the customer
+  dimension join and understate revenue by segment.

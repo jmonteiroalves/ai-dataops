@@ -1,0 +1,112 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ai-dataops"
+version = "0.1.0"
+description = "Data observability and AI-assisted incident diagnosis for batch data pipelines on GCP"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{ name = "Jeres Monteiro Alves" }]
+keywords = [
+  "data-observability",
+  "data-quality",
+  "dataops",
+  "anomaly-detection",
+  "gcp",
+  "bigquery",
+  "gemini",
+]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Typing :: Typed",
+]
+dependencies = [
+  "duckdb>=1.1,<2",
+  "pydantic>=2.7,<3",
+  "pydantic-settings>=2.4,<3",
+  "pyyaml>=6.0,<7",
+]
+
+[project.optional-dependencies]
+ai = [
+  "google-genai>=2.0,<3",
+]
+gcp = [
+  "google-cloud-bigquery>=3.25,<4",
+  "google-cloud-storage>=2.16,<4",
+]
+dashboard = [
+  "google-cloud-storage>=2.16,<4",
+  "streamlit>=1.40,<2",
+]
+dev = [
+  "mypy>=1.11",
+  "pytest>=8.2",
+  "pytest-cov>=5.0",
+  "ruff>=0.6",
+  "types-pyyaml>=6.0",
+]
+
+[project.scripts]
+dataops = "ai_dataops.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ai_dataops"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/ai_dataops/dashboard/app.py" = ["E501"]
+"src/ai_dataops/dashboard/theme.py" = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ai_dataops"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unused_ignores = true
+warn_return_any = true
+no_implicit_reexport = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["google.*", "google.cloud.*", "google.api_core.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers --strict-config"
+markers = [
+  "integration: tests that exercise an adapter boundary",
+  "gcp: tests that require a GCP project (opt-in)",
+  "live: tests that call an external API (opt-in, may cost money)",
+]
+
+[tool.coverage.run]
+source = ["ai_dataops"]
+branch = true
+omit = ["src/ai_dataops/__main__.py", "src/ai_dataops/dashboard/app.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 85
+exclude_lines = [
+  "pragma: no cover",
+  "if TYPE_CHECKING:",
+  "raise NotImplementedError",
+]
